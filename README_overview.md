@@ -1,4 +1,4 @@
-This directory the necessary modules for our Gaussian blur project.
+This directory has the necessary modules for our Gaussian blur project.
 
 There are 3 modules in this directory that are used to make this work.
 
