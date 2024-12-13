@@ -8,7 +8,7 @@ and blur effect which goes through a state machine that handles double buffering
 2) line_buffer - Efficiently tracks the neighboring pixel information for each pixel in the image, 
 maintaining current and previous line buffers to support our implementation of Gaussian blur.
 
-3) gaussian_blue_fsm - Efficiently tracks and provides neighboring pixel information for each pixel in 
+3) gaussian_blur_fsm - Efficiently tracks and provides neighboring pixel information for each pixel in 
 the image, maintaining current and previous line buffers to support complex image processing algorithms like Gaussian blur.
 
 These three modules work together to create a VGA display system with image processing capabilities.
