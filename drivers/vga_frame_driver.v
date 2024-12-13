@@ -20,10 +20,8 @@ output reg	     [7:0]		VGA_G,
 output reg	     [7:0]		VGA_R,
 output		          		VGA_SYNC_N,
 output		          		VGA_VS,
-output 				[23:0] debug_center,
-output 				[23:0] debug_left,
-output 				[23:0] debug_right,
-output [7:0]     LEDR, 
+
+
 
 /* access ports to the frame we draw from */
 input [14:0] the_vga_draw_frame_write_mem_address,
@@ -32,9 +30,7 @@ input the_vga_draw_frame_write_a_pixel
 );
 
 
-assign LEDR[2:0] = center_pixel[23:21];  // Show top 3 bits of red channel
-assign LEDR[5:3] = neighbor_l[23:21];    // Show top 3 bits of left pixel
-assign LEDR[7:6] = neighbor_r[23:22];    // Show top 2 bits of right pixel
+
 /* MEMORIES -------------------------------- */
 /* signals that will be combinationally swapped in each cycle - this is the double buffer */
 reg [1:0] wr_id;
@@ -53,6 +49,7 @@ wire [23:0] neighbor_tl, neighbor_t, neighbor_tr;
 wire [23:0] neighbor_l, neighbor_r;
 wire [23:0] neighbor_bl, neighbor_b, neighbor_br;
 wire buffer_valid;
+reg [23:0] delayed_mem_q;
 
 /* MEMORY to STORE the framebuffers */
 reg [15:0] frame_buf_mem_address0;
@@ -190,13 +187,21 @@ vga_driver the_vga(
     .VGA_SYNC_N(VGA_SYNC_N)
 );
 
+
+
+
+always @(posedge clk) begin
+    delayed_mem_q <= read_buf_mem_q;
+end
+
+
 // Modified VGA output logic to use blurred pixels
 always @(*) begin
     if (S == RFM_INIT_WAIT || S == RFM_INIT_START || S == RFM_DRAWING) begin
-        if (!KEY[3] && blur_valid_out)  // Only use blurred pixel when KEY[3] pressed and blur is valid
+        if (!KEY[3] && blur_valid_out)
             {VGA_R, VGA_G, VGA_B} = blurred_pixel;
         else
-            {VGA_R, VGA_G, VGA_B} = read_buf_mem_q;
+            {VGA_R, VGA_G, VGA_B} = delayed_mem_q; // Use delayed version
     end else
         {VGA_R, VGA_G, VGA_B} = 24'hFFFFFF;
 end
